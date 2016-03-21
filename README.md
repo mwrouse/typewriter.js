@@ -24,9 +24,9 @@ This is the most basic case for Typewriter.js, the ```.start()``` **is** require
 To customize the script, you need to pass it options, the options is also how you tell the script what to type.
 ```javascript
 var options = {
-                content: 'Hello, World!', // What the script will type
-                  delay: 3                // Delay in seconds before it starts typing
-              };
+  content: 'Hello, World!', // What the script will type
+    delay: 3                // Delay in seconds before it starts typing
+};
 Typewriter(elem, options).start();
 ```
 Above is an example of simple options, this script will wait three seconds, and then type ```Hello, World!```
