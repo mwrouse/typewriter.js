@@ -1,3 +1,3 @@
 ![Typewriter.js](https://raw.githubusercontent.com/mwrouse/typewriter.js/master/images/typewriterjs.gif)
 <hr/>
-A little JavaScript library to produce a typewriter effect
+A JavaScript library that allows for easy, and customizable typewriter effects.
