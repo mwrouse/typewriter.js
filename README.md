@@ -79,3 +79,21 @@ Typewriter(elem, options, function(){
   console.log('Callback Function');
 }).start();
 ```
+The callback function will **only be called once**. 
+
+
+### Helper Functions
+If you prefer to not use parameters to set the options and/or the callback function, you can use predefined helper functions to this for you:
+```javascript
+Typewriter(elem).setOptions(options).setCallback(function(){
+  console.log('Callback Function');
+}).start();
+```
+
+Similarly, you can use the ```setContent()``` helper function to set the options.content value.
+```javascript
+Typewriter(elem).setOptions(options).setCallback(function(){
+  console.log('Callback Function');
+}).setContent('This is what will be displayed').start();
+```
+There is no helper function for setting the element, that must be passed by parameter.
