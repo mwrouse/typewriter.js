@@ -16,8 +16,7 @@
     if (this === window) { return new TypeWriter(_elem, _options, _callback); }
 
     // Set Parent to the element
-    this.setElement(_elem);
-    if (typeof this.parent === 'object') { if (typeof _options === 'function') { _callback = _options; } _options = this.parent; this.parent = undefined; }
+    this.parent = _elem;
 
     // Allow _options to be the callback function
     if (_options && (typeof _options === 'function')) { _callback = _options; _options = undefined; }
@@ -27,35 +26,15 @@
     this.setCallback(_callback); // Copy the callback
 
     // Setup the blinking cursor
-
     this.cursor = document.createElement(this.options.cursor.tag);
     this.cursor.classList.add(this.options.cursor.class);
     this.parent.appendChild(this.cursor);
 
     return this;
-  };  // End TypWriter
-
-  /*
-   *
-   * Parameters...: new_parent - the new parent element
-   * Description..: Sets the parent
-   */
-  TypeWriter.prototype.setElement = function(new_parent)
-  {
-    if (new_parent instanceof HTMLElement)
-    {
-      this.parent = new_parent;
-
-      this.cursor = document.createElement(this.options.cursor.tag);
-      this.cursor.classList.add(this.options.cursor.class);
-      this.parent.appendChild(this.cursor);
-    }
-
-    return this;
-  };
+  };  // End TypeWriter
 
   /**
-   *
+   * Function.....: Set Options
    * Parameters...: new_options - the new options
    * Description..: Another way to setup options
    */
@@ -74,7 +53,7 @@
     this.options.cursor = (this.options.cursor === undefined || (typeof this.options.letters !== 'objcet')) ? { tag: undefined, class: undefined } : this.options.cursor;
     this.options.cursor.tag = (this.options.cursor.tag === undefined) ? 'span' : this.options.cursor.tag;
     this.options.cursor.class = (this.options.cursor.class === undefined) ? 'typewriter-cursor' : this.options.cursor.class;
-    this.options.cursor.noBlinkClass = (this.options.cursor.noBlinkClass === undefined) ? 'typewriter-solid' : this.options.cursor.noBlinkClass;
+    this.options.cursor.noBlinkClass = (this.options.cursor.noBlinkClass === undefined) ? 'typewriter-cursor-noblink' : this.options.cursor.noBlinkClass;
 
     this.options.callbackDelay = (this.options.callbackDelay === undefined) ? 1 : this.options.callbackDelay;
 
@@ -82,7 +61,7 @@
   }; // End setOptions
 
   /**
-   *
+   * Function.....: Set Content
    * Parameters...: new_content - the new content
    * Description..: Another way to set the content
    */
@@ -94,7 +73,7 @@
   }; // End setContent
 
   /**
-   *
+   * Function.....: Set Callback
    * Parameters...: new_callback - the new callback function
    * Description..: Another way to setup the callback function
    */
@@ -107,7 +86,7 @@
   }; // End setCallback
 
   /**
-   *
+   * Function.....: Cursor No Blink
    * Description..: Stops the cursor form blinking
    */
   TypeWriter.prototype.cursorNoBlink = function()
@@ -117,11 +96,11 @@
       this.cursor.classList.add(this.options.cursor.noBlinkClass); // Add the no blink class
     }
 
-    return this;
+    return null; // Prevent from using inline with the function
   }; // End cursorNoBlink
 
   /**
-   *
+   * Function.....: Cursor Blink
    * Description..: Sets the cursor to blink
    */
   TypeWriter.prototype.cursorBlink = function()
@@ -131,11 +110,11 @@
       this.cursor.classList.remove(this.options.cursor.noBlinkClass); // Remove the no blink class
     }
 
-    return this;
+    return null; // Prevent from using inline with function
   }; // End cursorBlink
 
   /**
-   *
+   * Function.....: Perform Callback
    * Parameters...: _callback - if this is set, it will not berform this.callback, it will perform _callback
    * Description..: Performs a callback function
    */
@@ -157,11 +136,11 @@
       }
     }, ((_delay === undefined) ? this.options.callbackDelay : _delay) * 1000);
 
-    return this;
+    return null; // Prevent from using inline
   }; // End performCallback
 
   /**
-   *
+   * Function.....: Type String
    * Parameters...: str - the string to type
    *                reset - will restart if true
    * Description..: Types a string
@@ -204,11 +183,11 @@
       me.performCallback();
     }
 
-    return this;
+    return null;
   }; // End typeString
 
   /**
-   *
+   * Function.....: Erase
    * Parameters...: _callback - callback for erasing
    * Description..: Erases a typed string
    */
@@ -235,11 +214,11 @@
       me.performCallback(_callback, 0);
     }
 
-    return this;
+    return null;
   }; // End erase
 
   /**
-   *
+   * Function.....: Backspace
    * Parameters...: _callback - callback after backspacing
    * Description..: Backspaces one character
    */
@@ -265,30 +244,41 @@
       });
     }
 
-    return this;
+    return null;
   }; // End backspace
 
   /**
-   *
+   * Function.....: Start
    * Parameters...: _callback - possible callback function
    * Description..: Starts the typing
    */
   TypeWriter.prototype.start = function(_callback)
   {
-    if (this.parent && (this.parent instanceof HTMLElement))
-    {
-      var me = this; // Remember this
+    var me = this; // Remember this
 
-      if (_callback) { this.setCallback(_callback); } // Attempt to make _callback the new callback function
+    if (_callback) { this.setCallback(_callback); } // Attempt to make _callback the new callback function
 
-      // Start typing after the specified delay
-      window.setTimeout(function(){
-        me.typeString(me.options.content, true); // Type the string and reset the index counter
-      }, this.options.delay * 1000);
-    }
-    return this;
+    // Start typing after the specified delay
+    window.setTimeout(function(){
+      me.typeString(me.options.content, true); // Type the string and reset the index counter
+    }, this.options.delay * 1000);
+
+    return null;
   }; // End start
 
+  /**
+   * Function.....: Start no Delay
+   * Description..: Starts the typing without a delay
+   */
+  TypeWriter.prototype.startNoDelay = function(_callback)
+  {
+    var me = this;
+    if (_callback) { this.setCallback(_callback); }
+
+    this.typeString(this.options.content, true);
+
+    return null;
+  }; // End Start no delay
 
 
 

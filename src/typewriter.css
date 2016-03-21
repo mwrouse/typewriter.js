@@ -24,7 +24,7 @@
   opacity: 0;
   animation: typewriter-cursor-blink 0.7s infinite;
 }
-.typewriter-solid
+.typewriter-cursor-noblink
 {
   opacity: 1;
   animation: none;
