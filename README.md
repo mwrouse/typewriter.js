@@ -15,7 +15,7 @@ This is the element that we want our typewriter effect to happen in.
 You need to pair this with the following JavaScript:
 ```javascript
 var elem = document.getElementById('typewriter');
-Typewriter(elem).start();
+elem.typewriter().start();
 ```
 This is the most basic case for Typewriter.js, the ```.start()``` **is** required.
 
@@ -27,11 +27,11 @@ var options = {
   content: 'Hello, World!', // What the script will type
     delay: 3                // Delay in seconds before it starts typing
 };
-Typewriter(elem, options).start();
+elem.typewriter(options).start();
 ```
 Above is an example of simple options, this script will wait three seconds, and then type ```Hello, World!```
 
-Options, is the second parameter of ```Typewriter```.
+Options, is the first parameter of ```typewriter```.
 
 Here is the full list of available options:
 ```
@@ -73,36 +73,36 @@ var options = {
 ```
 
 ### Callback Function 
-If you need to perform a task when the typeing is finished, pass a function as the third parameter to ```Typewriter()```
+If you need to perform a task when the typeing is finished, pass a function as the second parameter to ```typewriter()```
 ```javascript
-Typewriter(elem, options, function(me){
+elem.typewriter(options, function(me){
   console.log('Callback Function');
 }).start();
 ```
 The callback function will **only be called once**. 
-It is recommended that your callback functions have the first parameter as a way to reference ```this```, or point to ```Typewriter()```.
+It is recommended that your callback functions have the first parameter as a way to reference ```this```, or point to ```typewriter()```.
 
 
 ### Helper Functions
 If you prefer to not use parameters to set the options and/or the callback function, you can use predefined helper functions to this for you:
 ```javascript
-Typewriter(elem).setOptions(options).setCallback(function(me){
+elem.typewriter().setOptions(options).setCallback(function(me){
   console.log('Callback Function');
 }).start();
 ```
 Similarly, you can use the ```setContent()``` helper function to set the options.content value.
 ```javascript
-Typewriter(elem).setOptions(options).setCallback(function(me){
+elem.typewriter().setOptions(options).setCallback(function(me){
   console.log('Callback Function');
 }).setContent('This is what will be displayed').start();
 ```
-There is no helper function for setting the element, that must be passed by parameter.
+
 
 
 ### Backspacing
 To generate a backspace effect, you'll need to chain a couple of callback functions.
 ```javascript
-Typewriter(elem, {content: 'Typewriter.py'}, function(me){
+elem.typewriter({content: 'Typewriter.py'}, function(me){
   // First backspace
   me.backspace(function(me){
     // Second backspace
@@ -138,7 +138,7 @@ Typewriter.js
 ### Erasing 
 Using the erase function will erase the entire string that has been typed out, as seen in the gif at the top of this README
 ```javascript
-Typewriter(elem, {content: 'Typewriter.js'}, function(me){
+elem.typewriter({content: 'Typewriter.js'}, function(me){
   // First backspace
   me.erase(function(me){
     console.log('erase callback function');
