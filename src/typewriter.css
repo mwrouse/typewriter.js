@@ -1,0 +1,42 @@
+@keyframes typewriter-cursor-blink
+{
+   0% { opacity: 0.0; }
+  50% { opacity: 1.0; }
+   0% { opacity: 0.0; }
+}
+@keyframes typewriter-letter-show
+{
+    0% { opacity: 0.9; }
+  100% { opacity: 1.0; }
+}
+@keyframes typewriter-letter-hide
+{
+    0% { opacity: 1.0; }
+  100% { opacity: 1.0; }
+}
+.typewriter-cursor
+{
+  display: inline;
+  width: 0px;
+  height: 100%;
+  margin-left: 2px;
+  border: 1px solid #060606;
+  opacity: 0;
+  animation: typewriter-cursor-blink 0.7s infinite;
+}
+.typewriter-solid
+{
+  opacity: 1;
+  animation: none;
+}
+.typewriter-letter
+{
+  display: inline;
+  opacity: 1;
+  animation: typewriter-letter-show 0.08s 1;
+}
+.typewriter-letter-remove
+{
+  opacity: 0;
+  animation: typewriter-letter-hide 0.05s 1;
+}
