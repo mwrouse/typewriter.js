@@ -2,6 +2,8 @@
 <hr/>
 A JavaScript library that allows for easy, and customizable typewriter effects.
 
+Coming in at under 5KB (minified version), this library is super light weight, and extremely simple! No bullshit features or functions, just straight to the point!
+
 ## Usage
 Typewriter.js is a simple library, works on zero customization, but is also very customizable.
 
