@@ -16,8 +16,8 @@
     if (this === window) { return new TypeWriter(_elem, _options, _callback); }
 
     // Set Parent to the element
-    this.parent = _elem;
-    if (!(this.parent instanceof HTMLElement)) { return null; }
+    this.setElement(_elem);
+    if (typeof this.parent === 'object') { if (typeof _options === 'function') { _callback = _options; } _options = this.parent; this.parent = undefined; }
 
     // Allow _options to be the callback function
     if (_options && (typeof _options === 'function')) { _callback = _options; _options = undefined; }
@@ -27,6 +27,7 @@
     this.setCallback(_callback); // Copy the callback
 
     // Setup the blinking cursor
+
     this.cursor = document.createElement(this.options.cursor.tag);
     this.cursor.classList.add(this.options.cursor.class);
     this.parent.appendChild(this.cursor);
@@ -34,6 +35,24 @@
     return this;
   };  // End TypWriter
 
+  /*
+   *
+   * Parameters...: new_parent - the new parent element
+   * Description..: Sets the parent
+   */
+  TypeWriter.prototype.setElement = function(new_parent)
+  {
+    if (new_parent instanceof HTMLElement)
+    {
+      this.parent = new_parent;
+
+      this.cursor = document.createElement(this.options.cursor.tag);
+      this.cursor.classList.add(this.options.cursor.class);
+      this.parent.appendChild(this.cursor);
+    }
+
+    return this;
+  };
 
   /**
    *
@@ -256,15 +275,17 @@
    */
   TypeWriter.prototype.start = function(_callback)
   {
-    var me = this; // Remember this
+    if (this.parent && (this.parent instanceof HTMLElement))
+    {
+      var me = this; // Remember this
 
-    if (_callback) { this.setCallback(_callback); } // Attempt to make _callback the new callback function
+      if (_callback) { this.setCallback(_callback); } // Attempt to make _callback the new callback function
 
-    // Start typing after the specified delay
-    window.setTimeout(function(){
-      me.typeString(me.options.content, true); // Type the string and reset the index counter
-    }, this.options.delay * 1000);
-
+      // Start typing after the specified delay
+      window.setTimeout(function(){
+        me.typeString(me.options.content, true); // Type the string and reset the index counter
+      }, this.options.delay * 1000);
+    }
     return this;
   }; // End start
 
