@@ -81,7 +81,12 @@ elem.typewriter(options, function(me){
 ```
 The callback function will **only be called once**. 
 It is recommended that your callback functions have the first parameter as a way to reference ```this```, or point to ```typewriter()```.
-
+You can also specify the callback function in the ```.start()``` function:
+```javascript
+elem.typewriter().setContent('I love Yodeling').start(function(me){
+  console.log('Callback function executed');
+});
+```
 
 ### Helper Functions
 If you prefer to not use parameters to set the options and/or the callback function, you can use predefined helper functions to this for you:
