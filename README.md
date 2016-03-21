@@ -39,15 +39,15 @@ Here is the full list of available options:
 ```
               content: The string that you want to type (Default: 'I have no clue what to type')
                 delay: Delay (in seconds) before the script starts typing (Default: 2)
-    
+
           letters.tag: HTML Tag to use for letters (Default: 'span')
         letters.class: Class to use on letters (animation) (Default: 'typewriter-letter')
   letters.removeClass: Class to use for removing letters (animation) (Default: typewriter-letter-remove')
-  
+
            cursor.tag: HTML tag for the cursor (Default: 'span')
          cursor.class: Class to use on the cursor (animation) (Default: 'typewriter-cursor')
   cursor.noBlinkClass: Class that does not blink the cursor (Default: 'typewriter-cursor-noblink')
-   
+
         callbackDelay: Delay (in seconds) before the callback function is called (Default: 1)
 ```
 Note: letters and cursor are other objects
@@ -57,31 +57,31 @@ And, here is an example of options utilizing all of these:
 var options = {
                 content: 'Hello, World!',
                   delay: 2,
-                
+
                 letters: {
                           tag: 'span',
                         class: 'letter',
                   removeClass: 'letter-remove'
                 },
-                
+
                  cursor: {
                            tag: 'span',
                          class: 'cursor',
                   noBlinkClass: 'cursor-no-blink'
                  },
-                
+
           callBackDelay: 1.5
         };
 ```
 
-### Callback Function 
+### Callback Function
 If you need to perform a task when the typeing is finished, pass a function as the second parameter to ```typewriter()```
 ```javascript
 elem.typewriter(options, function(me){
   console.log('Callback Function');
 }).start();
 ```
-The callback function will **only be called once**. 
+The callback function will **only be called once**.
 It is recommended that your callback functions have the first parameter as a way to reference ```this```, or point to ```typewriter()```.
 You can also specify the callback function in the ```.start()``` function:
 ```javascript
@@ -121,7 +121,7 @@ elem.typewriter({content: 'Typewriter.py'}, function(me){
 ```
 The ```.startNoDelay()``` function is the exact same as ```.start()``` except it will not wait for the delay specified in options.
 
-This will yield the following: 
+This will yield the following:
 ```
 T
 Ty
@@ -142,7 +142,7 @@ Typewriter.j
 Typewriter.js
 ```
 
-### Erasing 
+### Erasing
 Using the erase function will erase the entire string that has been typed out, as seen in the gif at the top of this README
 ```javascript
 elem.typewriter({content: 'Typewriter.js'}, function(me){
@@ -153,15 +153,16 @@ elem.typewriter({content: 'Typewriter.js'}, function(me){
 }).start();
 ```
 
-## CSS Animations 
+## CSS Animations
 This script utilizes the ```animationend``` event listner to trigger typing the next letter(s), as well as callback functions on the last letters. Therefore, if you want to speed up the typing or backspacing, simply increase the animation duration on your css classes for the ```letters.removeClass``` and ```letters.class``` CSS classes.
 Likewise, to speedup these actions, slow down the animation durations.
 
 
 
-## Example 
+## Example
 View an example on [CodePen](http://codepen.io/mwrouse/full/PNpmbd)
 
+![Typewriter.js Demo](https://raw.githubusercontent.com/mwrouse/typewriter.js/master/images/demo.gif)
 
-## License 
+## License
 Distributed under the [MIT License](https://raw.githubusercontent.com/mwrouse/typewriter.js/master/LICENSE).
