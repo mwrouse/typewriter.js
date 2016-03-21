@@ -97,3 +97,10 @@ Typewriter(elem).setOptions(options).setCallback(function(){
 }).setContent('This is what will be displayed').start();
 ```
 There is no helper function for setting the element, that must be passed by parameter.
+
+## Example 
+View an example on [CodePen](http://codepen.io/mwrouse/full/PNpmbd)
+
+
+## License 
+Distributed under the [MIT License](https://raw.githubusercontent.com/mwrouse/typewriter.js/master/LICENSE).
