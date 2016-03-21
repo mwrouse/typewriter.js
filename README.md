@@ -1,6 +1,6 @@
 ![Typewriter.js](https://raw.githubusercontent.com/mwrouse/typewriter.js/master/images/typewriterjs.gif)
 <hr/>
-A JavaScript library that allows for easy, and customizable typewriter effects.
+A *pure JavaScript* library that allows for easy, and customizable typewriter effects.
 
 Coming in at under 5KB (minified version, css and js), this library is super lightweight, and extremely simple! 
 
