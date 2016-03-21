@@ -2,7 +2,7 @@
 <hr/>
 A JavaScript library that allows for easy, and customizable typewriter effects.
 
-Coming in at under 5KB (minified version, css and js), this library is super light weight, and extremely simple! 
+Coming in at under 5KB (minified version, css and js), this library is super lightweight, and extremely simple! 
 
 No bullshit features or functions, just straight to the point! 
 
@@ -79,7 +79,7 @@ var options = {
 ```
 
 ### Callback Function
-If you need to perform a task when the typeing is finished, pass a function as the second parameter to ```typewriter()```
+If you need to perform a task when the typing is finished, pass a function as the second parameter to ```typewriter()```
 ```javascript
 elem.typewriter(options, function(me){
   console.log('Callback Function');
