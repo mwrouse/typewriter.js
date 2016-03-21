@@ -6,6 +6,8 @@ Coming in at under 5KB (minified version, css and js), this library is super lig
 
 No bullshit features or functions, just straight to the point! 
 
+I do know it is nothing revolutionary.
+
 [See an example](https://github.com/mwrouse/typewriter.js#example)
 
 ## Usage
