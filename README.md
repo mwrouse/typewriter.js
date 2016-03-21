@@ -146,6 +146,9 @@ Typewriter(elem, {content: 'Typewriter.js'}, function(me){
 }).start();
 ```
 
+## CSS Animations 
+This script utilizes the ```animationend``` event listner to trigger typing the next letter(s), as well as callback functions on the last letters. Therefore, if you want to speed up the typing or backspacing, simply increase the animation duration on your css classes for the ```letters.removeClass``` and ```letters.class``` CSS classes.
+Likewise, to speedup these actions, slow down the animation durations.
 
 
 
