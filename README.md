@@ -2,9 +2,9 @@
 <hr/>
 A *pure JavaScript* library that allows for easy, and customizable typewriter effects.
 
-Coming in at under 5KB (minified version, css and js), this library is super lightweight, and extremely simple! 
+Coming in at under 6KB, this library is lightweight, and extremely simple!
 
-No bullshit features or functions, just straight to the point! 
+No bullshit features or functions, just straight to the point!
 
 [See an example](https://github.com/mwrouse/typewriter.js#example)
 
@@ -21,62 +21,104 @@ This is the element that we want our typewriter effect to happen in.
 You need to pair this with the following JavaScript:
 ```javascript
 var elem = document.getElementById('typewriter');
-elem.typewriter().start();
+elem.typewriter('Hello, World!').start();
 ```
 This is the most basic case for Typewriter.js, the ```.start()``` **is** required.
 
+This would type out ```Hello, World!``` inside the ```#typewriter``` DOM Element.
 
 ### Options
-To customize the script, you need to pass it options, the options is also how you tell the script what to type.
+To customize the script, you need to pass it options:
 ```javascript
 var options = {
-  content: 'Hello, World!', // What the script will type
-    delay: 3                // Delay in seconds before it starts typing
+    start_delay: 3 // Delay in seconds before it starts typing
 };
-elem.typewriter(options).start();
+elem.typewriter('Hello, World!', options).start();
 ```
 Above is an example of simple options, this script will wait three seconds, and then type ```Hello, World!```
 
-Options, is the first parameter of ```typewriter```.
+Options is the second, and last, parameter of ```typewriter```.
 
 Here is the full list of available options:
 ```
-              content: The string that you want to type (Default: 'I have no clue what to type')
-                delay: Delay (in seconds) before the script starts typing (Default: 2)
+                 mode: Mode to execute the script in (Default: 1/TYPEWRITER_MODE_DEFAULT)
+
+          start_delay: Delay (in seconds) before the script starts typing (Default: 2)
+       callback_delay: Delay (in seconds) before a callback function executes (Default: 1)
 
           letters.tag: HTML Tag to use for letters (Default: 'span')
         letters.class: Class to use on letters (animation) (Default: 'typewriter-letter')
-  letters.removeClass: Class to use for removing letters (animation) (Default: typewriter-letter-remove')
+ letters.remove_class: Class to use for removing letters (animation) (Default: typewriter-letter-remove')
 
            cursor.tag: HTML tag for the cursor (Default: 'span')
          cursor.class: Class to use on the cursor (animation) (Default: 'typewriter-cursor')
-  cursor.noBlinkClass: Class that does not blink the cursor (Default: 'typewriter-cursor-noblink')
-
-        callbackDelay: Delay (in seconds) before the callback function is called (Default: 1)
+cursor.no_blink_class: Class that does not blink the cursor (Default: 'typewriter-cursor-noblink')
 ```
 Note: letters and cursor are other objects
 
 And, here is an example of options utilizing all of these:
 ```javascript
 var options = {
-                content: 'Hello, World!',
-                  delay: 2,
+                mode: TYPEWRITER_MODE_DEFAULT,
+
+                start_delay: 3,
+                callback_delay: 1.5,
 
                 letters: {
                           tag: 'span',
                         class: 'letter',
-                  removeClass: 'letter-remove'
+                  remove_class: 'letter-remove'
                 },
 
                  cursor: {
                            tag: 'span',
                          class: 'cursor',
-                  noBlinkClass: 'cursor-no-blink'
+                  no_blink_class: 'cursor-no-blink'
                  },
-
-          callBackDelay: 1.5
         };
 ```
+
+### Script Modes
+Typewriter.js has four distinct modes that you can run in, DEFAULT, CORRECTION, and ARRAY.
+Each one has different traits, and requires that you format the first parameter of ```typewriter``` differently.
+
+Here are some helper constants for you to remember the modes, and their integer values:
+```
+TYPEWRITER_MODE_DEFAULT => 0
+TYPEWRITER_MODE_CORRECTION => 1
+TYPEWRITER_MODE_ARRAY => 2
+```
+
+#### Default Mode (0)
+The default mode, as its name implies, is the default/automatic mode that Typewriter.js will run under.
+
+This mode requires that a ```string``` be the first parameter of typewriter, here is a script that runs in DEFAULT MODE:
+
+```javascript
+elem.typewriter('This is mode 0, or the default mode').start();
+```
+
+#### Correction Mode (1)
+Correction mode, as its name also implies, allows you to generate a spelling correction.
+
+The first parameter now needs to be an ```array of strings```, with the first element being the incorrect version, and the second element being the corrected version. You will need to specify the mode in the options.
+
+```javascript
+elem.typewriter(['This was typedasdf in mode 1.', 'This was typed in mode 1.'], { mode: TYPEWRITER_MODE_CORRECTION }).start();
+```
+Which produces the following:
+![Typewriter.js Correction example](https://raw.githubusercontent.com/mwrouse/typewriter.js/master/images/correction.gif)
+
+
+#### Array Mode (2)
+Array allows you to display multiple messages, one after another, as well as making corrections!
+
+```javascript
+elem.typewriter(['This is the first sentence.', ['This is the secnd sentence', 'This is the second sentence']], { mode: TYPEWRITER_MODE_ARRAY }).start();
+```
+Which produces the following:
+![Typewriter.js Array example](https://raw.githubusercontent.com/mwrouse/typewriter.js/master/images/array.gif)
+
 
 ### Callback Function
 If you need to perform a task when the typing is finished, pass a function as the second parameter to ```typewriter()```
