@@ -107,6 +107,7 @@ The first parameter now needs to be an ```array of strings```, with the first el
 elem.typewriter(['This was typedasdf in mode 1.', 'This was typed in mode 1.'], { mode: TYPEWRITER_MODE_CORRECTION }).start();
 ```
 Which produces the following:
+
 ![Typewriter.js Correction example](https://raw.githubusercontent.com/mwrouse/typewriter.js/master/images/correction.gif)
 
 
@@ -117,6 +118,7 @@ Array allows you to display multiple messages, one after another, as well as mak
 elem.typewriter(['This is the first sentence.', ['This is the secnd sentence', 'This is the second sentence']], { mode: TYPEWRITER_MODE_ARRAY }).start();
 ```
 Which produces the following:
+
 ![Typewriter.js Array example](https://raw.githubusercontent.com/mwrouse/typewriter.js/master/images/array.gif)
 
 
