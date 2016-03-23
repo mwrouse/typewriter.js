@@ -242,5 +242,7 @@ Likewise, to speedup these actions, slow down the animation durations.
 ## Example
 View an example on [CodePen](http://codepen.io/mwrouse/full/PNpmbd)
 
+The text will turn green when each callback function is executed, be sure to pay attention to that.
+
 ## License
 Distributed under the [MIT License](https://raw.githubusercontent.com/mwrouse/typewriter.js/master/LICENSE).
