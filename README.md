@@ -78,6 +78,19 @@ var options = {
         };
 ```
 
+
+If you prefer to not pass options as a parameter of ```typewriter```, then the ```setOptions``` method exists to set options:
+```javascript
+elem.typewriter('Hello, World!').setOptions(options).start();
+```
+
+Similarly, the ```setContent``` method allows you to set the text to type:
+```javascript
+elem.typewriter().setContent('Hello, World!').start();
+```
+The ```setContent``` function is *extremely* useful when typing more stuff in callback functions.
+
+
 ### Script Modes
 Typewriter.js has four distinct modes that you can run in, DEFAULT, CORRECTION, and ARRAY.
 Each one has different traits, and requires that you format the first parameter of ```typewriter``` differently.
@@ -97,6 +110,11 @@ This mode requires that a ```string``` be the first parameter of typewriter, her
 ```javascript
 elem.typewriter('This is mode 0, or the default mode').start();
 ```
+Which produces the following:
+
+![Typewriter.js Default example](https://raw.githubusercontent.com/mwrouse/typewriter.js/master/images/default.gif)
+
+
 
 #### Correction Mode (1)
 Correction mode, as its name also implies, allows you to generate a spelling correction.
@@ -104,7 +122,8 @@ Correction mode, as its name also implies, allows you to generate a spelling cor
 The first parameter now needs to be an ```array of strings```, with the first element being the incorrect version, and the second element being the corrected version. You will need to specify the mode in the options.
 
 ```javascript
-elem.typewriter(['This was typedasdf in mode 1.', 'This was typed in mode 1.'], { mode: TYPEWRITER_MODE_CORRECTION }).start();
+elem.typewriter(['This was typedasdf in mode 1.', 'This was typed in mode 1.'],
+  { mode: TYPEWRITER_MODE_CORRECTION }).start();
 ```
 Which produces the following:
 
@@ -115,7 +134,8 @@ Which produces the following:
 Array allows you to display multiple messages, one after another, as well as making corrections!
 
 ```javascript
-elem.typewriter(['This is the first sentence.', ['This is the secnd sentence', 'This is the second sentence']], { mode: TYPEWRITER_MODE_ARRAY }).start();
+elem.typewriter(['This is the first sentence.', ['This is the secnd sentence', 'This is the second sentence']],
+  { mode: TYPEWRITER_MODE_ARRAY }).start();
 ```
 Which produces the following:
 
@@ -123,72 +143,64 @@ Which produces the following:
 
 
 ### Callback Function
-If you need to perform a task when the typing is finished, pass a function as the second parameter to ```typewriter()```
+There are two ways to execute callback functions:
+
+Using the ```setCallback``` method:
 ```javascript
-elem.typewriter(options, function(me){
-  console.log('Callback Function');
+elem.typewriter('Hello, World!', options).setCallback(function(me){
+  console.log('callback function');
 }).start();
-```
-The callback function will **only be called once**.
-It is recommended that your callback functions have the first parameter as a way to reference ```this```, or point to ```typewriter()```.
-You can also specify the callback function in the ```.start()``` function:
-```javascript
-elem.typewriter().setContent('I love Yodeling').start(function(me){
-  console.log('Callback function executed');
-});
 ```
 
-### Helper Functions
-If you prefer to not use parameters to set the options and/or the callback function, you can use predefined helper functions to this for you:
+And, adding the function as a parameter to the ```start``` method:
 ```javascript
-elem.typewriter().setOptions(options).setCallback(function(me){
-  console.log('Callback Function');
-}).start();
+elem.typewriter('Hello, World!', options).start(function(me){
+  console.log('callback function');
+});
 ```
-Similarly, you can use the ```setContent()``` helper function to set the options.content value.
-```javascript
-elem.typewriter().setOptions(options).setCallback(function(me){
-  console.log('Callback Function');
-}).setContent('This is what will be displayed').start();
-```
+If you put both of these methods, the callback function that is a parameter to the ```start``` method is the one that will be executed.
+
+The callback function will **only be called once**.
+It is recommended that your callback functions have the first parameter as a way to reference ```this```, or point to ```typewriter()```.
+
 
 
 
 ### Backspacing
-To generate a backspace effect, you'll need to chain a couple of callback functions.
+While it is recommended that you use the ```TYPEWRITER_MODE_CORRECTION``` mode to produce a correction effect, you may like to do things the old fashioned way, or the hard way. You do you.
+
+For you people, the ```backspace``` method exists, call it from a callback function, using the syntax:
 ```javascript
-elem.typewriter({content: 'Typewriter.py'}, function(me){
+me.backspace(callback_function);
+```
+Where ```me``` is a reference to ```typewriter```, the parameter we suggested you have in the callback function.
+The ```backspace``` method accepts one parameter, which is a callback function, use this to daisy chain callbacks :)
+
+Example:
+```javascript
+elem.typewriter('typewriter.py').start(function(me){
   // First backspace
   me.backspace(function(me){
     // Second backspace
     me.backspace(function(me){
-      me.setContent('js').startNoDelay(); // Make correction
+      me.setContent('js').startNoDelay(); // Make correction, changes to typewriter.js
     });
   });
-}).start();
+});
 ```
-The ```.startNoDelay()``` function is the exact same as ```.start()``` except it will not wait for the delay specified in options.
+This will produce the following:
 
-This will yield the following:
+![Typewriter.js Backspace example](https://raw.githubusercontent.com/mwrouse/typewriter.js/master/images/backspace.gif)
+
+This is the same as writing:
+```javascript
+elem.typewriter(['typewriter.py', 'typewriter.js'], { mode: TYPEWRITER_MODE_CORRECTION }).start();
 ```
-T
-Ty
-Typ
-Type
-Typew
-Typewr
-Typewri
-Typewrit
-Typewrite
-Typewriter
-Typewriter.
-Typewriter.p
-Typewriter.py
-Typewriter.p
-Typewriter.
-Typewriter.j
-Typewriter.js
-```
+And is the suggested way to make corrections.
+
+#### startNoDelay Method
+In the above example there is the ```startNoDelay``` method, this does the exact same thing as the ```start``` method, except there is no delay before typing.
+
 
 ### Erasing
 Using the erase function will erase the entire string that has been typed out, as seen in the gif at the top of this README
