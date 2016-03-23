@@ -93,8 +93,8 @@ The ```setContent``` method is *extremely* useful when typing more stuff in call
 
 
 ### Script Modes
-Typewriter.js has four distinct modes that you can run in, ```DEFAULT```, ```CORRECTION```, and ```ARRAY```.
-Each one has different traits, and requires that you format the first parameter of ```typewriter``` differently.
+Typewriter.js has three modes that you can ran in, ```DEFAULT```, ```CORRECTION```, and ```ARRAY```.
+Each one has allows for bigger and better typewriting effects, and requires that you format the first parameter of ```typewriter``` differently.
 
 Here are some helper constants for you to remember the modes, and their integer values:
 ```
@@ -222,7 +222,10 @@ Which will result in the following:
 The ```erase``` method also accepts a callback function like the ```backspace``` method.
 
 ## CSS Animations
-This script utilizes the ```animationend``` event listener to trigger typing the next letter(s), as well as callback functions on the last letters. Therefore, if you want to speed up the typing or backspacing, simply increase the animation duration on your CSS classes for the ```letters.removeClass``` and ```letters.class``` CSS classes.
+This script utilizes the ```animationend``` event listener to trigger typing the next letter(s), as well as callback functions on the last letters.
+
+Therefore, if you want to speed up the typing or backspacing, simply increase the animation duration on your CSS classes for the ```letters.removeClass``` and ```letters.class``` CSS classes.
+
 Likewise, to speedup these actions, slow down the animation durations.
 
 
