@@ -91,6 +91,8 @@ elem.typewriter().setContent('Hello, World!').start();
 ```
 The ```setContent``` method is *extremely* useful when typing more stuff in callback functions.
 
+Currently, ```setContent``` does not work when wanting to use modes ```TYPEWRITER_MODE_ARRAY``` and ```TYPEWRITER_MODE_CORRECTION```.
+
 
 ### Script Modes
 Typewriter.js has three modes that you can use, ```DEFAULT```, ```CORRECTION```, and ```ARRAY```.

@@ -446,7 +446,7 @@ const TYPEWRITER_MODE_ARRAY = 2;       // Type an array (types a string, erases,
      * Constructor stuff
      */
     this.setOptions(_options);
-
+    
     return this;
 
   }; // End TypeWriter
