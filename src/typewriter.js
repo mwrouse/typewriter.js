@@ -230,6 +230,11 @@ const TYPEWRITER_MODE_ARRAY = 2;       // Type an array (types a string, erases,
                   typeArray();
                 });
               }
+              else
+              {
+                // No more elements, perform callback
+                performCallback();
+              }
             }); // Send to type correction, not enough elements
           }
           else
@@ -242,9 +247,18 @@ const TYPEWRITER_MODE_ARRAY = 2;       // Type an array (types a string, erases,
                   typeArray();
                 });
               }
+              else
+              {
+                // No more elments, perform callback
+                performCallback();
+              }
             })
           }
 
+        }
+        else
+        {
+          performCallback(); // Do I need this???
         }
       }
     } // End typeArray
@@ -282,10 +296,7 @@ const TYPEWRITER_MODE_ARRAY = 2;       // Type an array (types a string, erases,
             // backspace to where they are different
             backspaceUntilLengthIs(different_at, function(){
               typeString(_content[1].replace(_content[0].slice(0, different_at), ''), function(){
-                if ((_callback !== undefined) && (typeof _callback === 'function'))
-                {
-                  _callback();
-                }
+                performCallback(_callback); // Perform the custom callback, or the original callback
               });
             });
           });
@@ -311,7 +322,7 @@ const TYPEWRITER_MODE_ARRAY = 2;       // Type an array (types a string, erases,
         // Perform the callback
         if ((_callback !== undefined))
         {
-          _callback();
+          performCallback(_callback);
         }
       }
     } // End backspaceUntilLengthIs
@@ -431,20 +442,14 @@ const TYPEWRITER_MODE_ARRAY = 2;       // Type an array (types a string, erases,
     }; // End startNoDelay
 
 
-
-
     /*
      * Constructor stuff
      */
     this.setOptions(_options);
 
-
-
     return this;
 
   }; // End TypeWriter
-
-
 
 
   if (!HTMLElement.prototype.typewriter)
