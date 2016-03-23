@@ -94,7 +94,8 @@ The ```setContent``` method is *extremely* useful when typing more stuff in call
 
 ### Script Modes
 Typewriter.js has three modes that you can use, ```DEFAULT```, ```CORRECTION```, and ```ARRAY```.
-Each one has allows for bigger and better typewriting effects, and requires that you format the first parameter of ```typewriter``` differently.
+
+Each one allows for bigger and better typewriting effects, and requires that you format the first parameter of ```typewriter``` differently.
 
 Here are some helper constants for you to remember the modes, and their integer values:
 ```
