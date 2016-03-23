@@ -78,21 +78,22 @@ var options = {
         };
 ```
 
-
+#### setOptions method
 If you prefer to not pass options as a parameter of ```typewriter```, then the ```setOptions``` method exists to set options:
 ```javascript
 elem.typewriter('Hello, World!').setOptions(options).start();
 ```
 
+#### setContent method
 Similarly, the ```setContent``` method allows you to set the text to type:
 ```javascript
 elem.typewriter().setContent('Hello, World!').start();
 ```
-The ```setContent``` function is *extremely* useful when typing more stuff in callback functions.
+The ```setContent``` method is *extremely* useful when typing more stuff in callback functions.
 
 
 ### Script Modes
-Typewriter.js has four distinct modes that you can run in, DEFAULT, CORRECTION, and ARRAY.
+Typewriter.js has four distinct modes that you can run in, ```DEFAULT```, ```CORRECTION```, and ```ARRAY```.
 Each one has different traits, and requires that you format the first parameter of ```typewriter``` differently.
 
 Here are some helper constants for you to remember the modes, and their integer values:
@@ -105,7 +106,7 @@ TYPEWRITER_MODE_ARRAY => 2
 #### Default Mode (0)
 The default mode, as its name implies, is the default/automatic mode that Typewriter.js will run under.
 
-This mode requires that a ```string``` be the first parameter of typewriter, here is a script that runs in DEFAULT MODE:
+This mode requires that a ```string``` be the first parameter of ```typewriter```, here is a script that runs in ```DEFAULT MODE```:
 
 ```javascript
 elem.typewriter('This is mode 0, or the default mode').start();
@@ -133,6 +134,8 @@ Which produces the following:
 #### Array Mode (2)
 Array allows you to display multiple messages, one after another, as well as making corrections!
 
+The first parameter must be an ```array```, which can have ```array``` or ```string``` elements.
+
 ```javascript
 elem.typewriter(['This is the first sentence.', ['This is the secnd sentence', 'This is the second sentence']],
   { mode: TYPEWRITER_MODE_ARRAY }).start();
@@ -152,16 +155,16 @@ elem.typewriter('Hello, World!', options).setCallback(function(me){
 }).start();
 ```
 
-And, adding the function as a parameter to the ```start``` method:
+**OR**, adding the function as a parameter to the ```start``` method:
 ```javascript
 elem.typewriter('Hello, World!', options).start(function(me){
   console.log('callback function');
 });
 ```
-If you put both of these methods, the callback function that is a parameter to the ```start``` method is the one that will be executed.
+If you put both of these, the callback function that is a parameter to the ```start``` method is the one that will be executed.
 
 The callback function will **only be called once**.
-It is recommended that your callback functions have the first parameter as a way to reference ```this```, or point to ```typewriter()```.
+It is recommended that your callback functions have the first parameter as a way to reference ```this```, or point to ```typewriter```.
 
 
 
@@ -201,20 +204,25 @@ And is the suggested way to make corrections.
 #### startNoDelay Method
 In the above example there is the ```startNoDelay``` method, this does the exact same thing as the ```start``` method, except there is no delay before typing.
 
+The ```startNoDelay``` method accepts a callback function as a parameter, just like the ```start``` method does.
+
 
 ### Erasing
-Using the erase function will erase the entire string that has been typed out, as seen in the gif at the top of this README
+Using the ```erase``` method, in a callback function, is a way to erase the entire sentence that has just been typed.
+
 ```javascript
-elem.typewriter({content: 'Typewriter.js'}, function(me){
-  // First backspace
-  me.erase(function(me){
-    console.log('erase callback function');
-  });
-}).start();
+elem.typewriter('This will all be erased').start(function(me){
+  me.erase();
+});
 ```
+Which will result in the following:
+
+![Typewriter.js erase example](https://raw.githubusercontent.com/mwrouse/typewriter.js/master/images/erase.gif)
+
+The ```erase``` method also accepts a callback function like the ```backspace``` method.
 
 ## CSS Animations
-This script utilizes the ```animationend``` event listner to trigger typing the next letter(s), as well as callback functions on the last letters. Therefore, if you want to speed up the typing or backspacing, simply increase the animation duration on your css classes for the ```letters.removeClass``` and ```letters.class``` CSS classes.
+This script utilizes the ```animationend``` event listener to trigger typing the next letter(s), as well as callback functions on the last letters. Therefore, if you want to speed up the typing or backspacing, simply increase the animation duration on your CSS classes for the ```letters.removeClass``` and ```letters.class``` CSS classes.
 Likewise, to speedup these actions, slow down the animation durations.
 
 

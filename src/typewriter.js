@@ -35,6 +35,7 @@ const TYPEWRITER_MODE_ARRAY = 2;       // Type an array (types a string, erases,
     // Default content if it's not defined ( private variable )
     var content = (_text === undefined) ? 'I have no clue what to type' : _text;
 
+    if (typeof _text === 'object' && !(_text instanceof Array) && _options === undefined) { _options = _text; }
     // Callback starts out as undefined ( private variable )
     var callback = undefined;
 
