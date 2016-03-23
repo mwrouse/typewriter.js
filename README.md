@@ -131,6 +131,8 @@ Which produces the following:
 
 ![Typewriter.js Correction example](https://raw.githubusercontent.com/mwrouse/typewriter.js/master/images/correction.gif)
 
+Only the first two elements will be used, if you have more than two elements, they will not be used, see the ```TYPEWRITER_MODE_ARRAY``` mode.
+
 
 #### Array Mode (2)
 Array allows you to display multiple messages, one after another, as well as making corrections!
@@ -229,7 +231,7 @@ elem.typewriter(['This will all be erased', ''], { mode: TYPEWRITER_MODE_CORRECT
 
 
 ## CSS Animations
-This script utilizes the ```animationend``` event listener to trigger typing the next letter(s), as well as callback functions on the last letters.
+This script utilizes the ```animationend``` event listener to trigger typing the next letter(s), removing letters, as well as callback functions on the last letters.
 
 Therefore, if you want to speed up the typing or backspacing, simply increase the animation duration on your CSS classes for the ```letters.removeClass``` and ```letters.class``` CSS classes.
 
