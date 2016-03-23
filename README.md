@@ -233,7 +233,7 @@ elem.typewriter(['This will all be erased', ''], { mode: TYPEWRITER_MODE_CORRECT
 ## CSS Animations
 This script utilizes the ```animationend``` event listener to trigger typing the next letter(s), removing letters, as well as callback functions on the last letters.
 
-Therefore, if you want to speed up the typing or backspacing, simply increase the animation duration on your CSS classes for the ```letters.removeClass``` and ```letters.class``` CSS classes.
+Therefore, if you want to speed up the typing or backspacing, simply increase the animation duration on your CSS classes for the ```letters.remove_class``` and ```letters.class``` CSS classes.
 
 Likewise, to speedup these actions, slow down the animation durations.
 
