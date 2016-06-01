@@ -169,7 +169,21 @@ elem.typewriter('Hello, World!', options).start(function(me){
 If you put both of these, the callback function that is a parameter to the ```start``` method is the one that will be executed.
 
 The callback function will **only be called once**.
-It is recommended that your callback functions have the first parameter as a way to reference ```this```, or point to ```typewriter```.
+
+#### Callback Parameters
+The first parameter of the callback function is a reference to ```typewriter```, you can use this to chain together typewriter functions, like so:
+```javascript
+elem.typewriter('Hello, World', options).start(function(me){
+  me.erase(); // This will erase what was just typed
+});
+```
+
+The Second parameter, optional, is a reference to the DOM Element that the typewriter is applied to, you can use this to make changes to the element in the callback function:
+```javascript
+element.typewriter('Hello, World', options).start(function(me, elem){
+  elem.classList.add('finished'); // Will add the finished class to the element
+});
+```
 
 
 
@@ -206,11 +220,6 @@ elem.typewriter(['typewriter.py', 'typewriter.js'], { mode: TYPEWRITER_MODE_CORR
 ```
 And is the suggested way to make corrections.
 
-#### startNoDelay Method
-In the above example there is the ```startNoDelay``` method, this does the exact same thing as the ```start``` method, except there is no delay before typing.
-
-The ```startNoDelay``` method accepts a callback function as a parameter, just like the ```start``` method does.
-
 
 ### Erasing
 Using the ```erase``` method, in a callback function, is a way to erase the entire sentence that has just been typed.
@@ -230,6 +239,12 @@ You can use the ```TYPEWRITER_MODE_CORRECTION``` mode to simular this as well:
 ```javascript
 elem.typewriter(['This will all be erased', ''], { mode: TYPEWRITER_MODE_CORRECTION }).start();
 ```
+
+#### startNoDelay Method
+In the above example there is the ```startNoDelay``` method, this does the exact same thing as the ```start``` method, except there is no delay before typing.
+
+The ```startNoDelay``` method accepts a callback function as a parameter, just like the ```start``` method does.
+
 
 
 ## CSS Animations

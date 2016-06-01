@@ -7,6 +7,14 @@ const TYPEWRITER_MODE_CORRECTION = 1;  // Type a string, then backspace until st
 const TYPEWRITER_MODE_ARRAY = 2;       // Type an array (types a string, erases, type the next index)
 
 (function(){
+  // Functions exclusive to this scope
+  function isType($target, $type) { return ( typeof $target === $type ); }
+  function setDefault($target, $default, $ref) { if ( ($ref[$target] === undefined) || !isType($ref[$target], typeof $default) ) $ref[$target] = $default; };
+
+
+  /**
+   * TypeWriter Constructor
+   */
   var TypeWriter = function($txt, $options, $parent)
   {
     if (this instanceof HTMLElement) return new TypeWriter($txt, $options, this);
@@ -14,17 +22,15 @@ const TYPEWRITER_MODE_ARRAY = 2;       // Type an array (types a string, erases,
     // Validate Parameters
     $txt = ($txt === undefined) ? 'I have no clue what to type' : $txt;
 
-    if ( (typeof $txt == 'object') && !($txt instanceof Array) && ($options === undefined) )
+    if ( isType($txt, 'object') && !($txt instanceof Array) && ($options === undefined) )
       $options = $txt;
 
     // Constructor
-    this.__parent = $parent;
+    this.__element = $parent;
+    this.__content = $txt;
     this.__cursor = undefined;
     this.__options = undefined;
-    this.__content = $txt;
     this.__callback = undefined;
-
-    this.element = this.elem = this.el = this.__parent;
 
     this.setOptions($options);
 
@@ -36,12 +42,6 @@ const TYPEWRITER_MODE_ARRAY = 2;       // Type an array (types a string, erases,
    *   "Private" member functions
    * ================================
    */
-  TypeWriter.prototype.__default__ = function ($target, $default, $ref)
-  {
-    if ( ($ref[$target] === undefined) || (typeof $ref[$target] !== typeof $default) )
-      $ref[$target] = $default;
-  }; // End __default__
-
 
   /**
    * Method.......: Cursor No blink ( private )
@@ -80,18 +80,17 @@ const TYPEWRITER_MODE_ARRAY = 2;       // Type an array (types a string, erases,
   TypeWriter.prototype.__performCallback__ = function($callback, $delay) {
     var me = this;
 
-    if ( typeof $callback === 'number' ) { $delay = $callback; $calllback = undefined; }
+    if ( isType($callback, 'number') ) { $delay = $callback; $calllback = undefined; }
 
-    var finalCallback = ( ($callback === undefined) || (typeof $callback !== 'function') ) ? me.__callback : $callback;
-    var finalDelay = ( ($delay === undefined) || (typeof $delay !== 'number') ) ? me.__options.callback_delay : $delay;
+    var finalCallback = isType($callback, 'function') ? $callback : me.__callback;
+    var finalDelay = isType($delay, 'number')  ? $delay : me.__options.callback_delay;
 
     // Timeout to perform callback
-    if ( (finalCallback !== undefined) && (typeof finalCallback === 'function') )
+    if ( isType(finalCallback, 'function') )
     {
-
       window.setTimeout(function(){
         // Perform callback function
-        finalCallback(me);
+        finalCallback(me, me.__element);
 
         if ( finalCallback === me.__callback )
           me.__callback = undefined;
@@ -138,7 +137,7 @@ const TYPEWRITER_MODE_ARRAY = 2;       // Type an array (types a string, erases,
   TypeWriter.prototype.__typeString__ = function($str, $callback) {
     var me = this;
 
-    $str = ( ($str === undefined) || (typeof $str !== 'string') ) ? 'Invalid String' : $str;
+    $str = isType($str, 'string') ? $str : 'Invalid String';
 
     if ($str.length > 0)
     {
@@ -159,7 +158,7 @@ const TYPEWRITER_MODE_ARRAY = 2;       // Type an array (types a string, erases,
         this.removeEventListener('animationend', arguments.callee);
       }); // Event listener
 
-      me.__parent.insertBefore(letter, me.__cursor);
+      me.__element.insertBefore(letter, me.__cursor);
     }
     else
     {
@@ -276,7 +275,7 @@ const TYPEWRITER_MODE_ARRAY = 2;       // Type an array (types a string, erases,
   TypeWriter.prototype.__backspaceToLength__ = function($length, $callback) {
     var me = this;
 
-    if ( (me.__parent.childNodes.length - 1) > $length)
+    if ( (me.__element.childNodes.length - 1) > $length)
     {
       // Keep backspacing
       me.backspace(function(){
@@ -286,7 +285,7 @@ const TYPEWRITER_MODE_ARRAY = 2;       // Type an array (types a string, erases,
     else
     {
       // Done backspacing
-      if ( ($callback !== undefined) && (typeof $callback === 'function') )
+      if ( isType($callback, 'function') )
         me.__performCallback__($callback);
     }
 
@@ -310,12 +309,12 @@ const TYPEWRITER_MODE_ARRAY = 2;       // Type an array (types a string, erases,
   TypeWriter.prototype.setOptions = function($newOptions) {
     var me = this;
 
-    var options = (($newOptions === undefined) || (typeof $newOptions !== 'object')) ? { } : $newOptions;
+    var options = !isType($newOptions, 'object') ? { } : $newOptions;
 
     /**
      * Set default options, and valid options if they exist
      */
-    if ( (options.mode === undefined) || (typeof options.mode !== 'number') || (options.mode > 2 || options.mode < 0) )
+    if ( !isType(options.mode, 'number') || (options.mode > 2 || options.mode < 0) )
       options.mode = TYPEWRITER_MODE_DEFAULT;
 
     if ( (options.mode == TYPEWRITER_MODE_CORRECTION || options.mode == TYPEWRITER_MODE_ARRAY) &&
@@ -329,28 +328,28 @@ const TYPEWRITER_MODE_ARRAY = 2;       // Type an array (types a string, erases,
         me.__content = me.__content[0];
 
     // Default start delay (2s)
-    me.__default__('start_delay', 2, options);
+    setDefault('start_delay', 2, options);
 
     // Default callback delay (1s)
-    me.__default__('callback_delay', 1, options);
+    setDefault('callback_delay', 1, options);
 
     // Default letter
-    me.__default__('letters', {}, options);
-    me.__default__('tag', 'span', options.letters);
-    me.__default__('class', 'typewriter-letter', options.letters);
-    me.__default__('remove_class', 'typewriter-letter-remove', options.letters);
+    setDefault('letters', {}, options);
+    setDefault('tag', 'span', options.letters);
+    setDefault('class', 'typewriter-letter', options.letters);
+    setDefault('remove_class', 'typewriter-letter-remove', options.letters);
 
     // Default cursor
-    me.__default__('cursor', {}, options);
-    me.__default__('tag', 'span', options.cursor);
-    me.__default__('class', 'typewriter-cursor', options.cursor);
-    me.__default__('no_blink_class', 'typewriter-cursor-noblink', options.cursor);
+    setDefault('cursor', {}, options);
+    setDefault('tag', 'span', options.cursor);
+    setDefault('class', 'typewriter-cursor', options.cursor);
+    setDefault('no_blink_class', 'typewriter-cursor-noblink', options.cursor);
 
     if ( me.__cursor === undefined )
     {
       me.__cursor = document.createElement(options.cursor.tag);
       me.__cursor.classList.add(options.cursor.class);
-      me.__parent.appendChild(me.__cursor);
+      me.__element.appendChild(me.__cursor);
     }
 
     // Update the options
@@ -387,7 +386,7 @@ const TYPEWRITER_MODE_ARRAY = 2;       // Type an array (types a string, erases,
   TypeWriter.prototype.setCallback = function($newCallback) {
     var me = this;
 
-    if ( ($newCallback !== undefined) && (typeof $newCallback === 'function') )
+    if ( isType($newCallback, 'function') )
       me.__callback = $newCallback;
 
     return me;
@@ -404,24 +403,24 @@ const TYPEWRITER_MODE_ARRAY = 2;       // Type an array (types a string, erases,
     var me = this;
 
     // Only backspace if there is a character to backspace (> 1 because it will have 1 child because of the cursor)
-    if ( me.__parent.childNodes.length > 1 )
+    if ( me.__element.childNodes.length > 1 )
     {
-      var lastLetter = me.__parent.childNodes.length - 2; // -2 because the last child node is the cursor
+      var lastLetter = me.__element.childNodes.length - 2; // -2 because the last child node is the cursor
 
       // Animation event listener
-      me.__parent.childNodes[lastLetter].addEventListener('animationend', function(){
+      me.__element.childNodes[lastLetter].addEventListener('animationend', function(){
         // Remove the letter element
-        me.__parent.removeChild(me.__parent.childNodes[lastLetter]);
+        me.__element.removeChild(me.__element.childNodes[lastLetter]);
 
         this.removeEventListener('animationend', arguments.callee); // Remove the event listener
 
-        if ( ($callback !== undefined) && (typeof $callback === 'function') )
+        if ( isType($callback, 'function') )
           me.__performCallback__($callback, 0); // perform the callback function
 
       });
 
       // Add the class to remove the letter, and triggers the animationend event listener
-      me.__parent.childNodes[lastLetter].classList.add(me.__options.letters.remove_class || 'typewriter-letter-remove');
+      me.__element.childNodes[lastLetter].classList.add(me.__options.letters.remove_class || 'typewriter-letter-remove');
 
     }
 
@@ -437,7 +436,7 @@ const TYPEWRITER_MODE_ARRAY = 2;       // Type an array (types a string, erases,
     var me = this;
 
     // Only erase if there are any letters
-    if ( me.__parent.childNodes.length > 1 )
+    if ( me.__element.childNodes.length > 1 )
     {
       // Stop the cursor blinking
       me.__cursorNoBlink__();
@@ -452,7 +451,7 @@ const TYPEWRITER_MODE_ARRAY = 2;       // Type an array (types a string, erases,
       // Done erasing, let the cursor blink
       me.__cursorBlink__();
 
-      if ( ($callback !== undefined) && (typeof $callback === 'function') )
+      if ( isType($callback, 'function') )
         me.__performCallback__($callback);
     }
 
@@ -467,7 +466,7 @@ const TYPEWRITER_MODE_ARRAY = 2;       // Type an array (types a string, erases,
   TypeWriter.prototype.start = function($callback) {
     var me = this;
 
-    if ( ($callback !== undefined) && (typeof $callback === 'function') )
+    if ( isType($callback, 'function') )
       me.setCallback($callback);
 
     // Start typing after a delay
@@ -487,7 +486,7 @@ const TYPEWRITER_MODE_ARRAY = 2;       // Type an array (types a string, erases,
   TypeWriter.prototype.startNoDelay = function($callback) {
     var me = this;
 
-    if ( ($callback !== undefined) && (typeof $callback === 'function') )
+    if ( isType($callback, 'function') )
       me.setCallback($callback);
 
     // Start typing, no delay
