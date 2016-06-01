@@ -1,14 +1,3 @@
-/**
- * ====================================
- *        JavaScript Typewriter
- * ===================================
- *
- * Author.......: Michael Rouse
- * Language.....: JavaScript
- * Date.........: March 2016
- *
- * Description..: Typewriter effect for text
- */
 
 /*
  * Typewriter Modes
@@ -18,450 +7,498 @@ const TYPEWRITER_MODE_CORRECTION = 1;  // Type a string, then backspace until st
 const TYPEWRITER_MODE_ARRAY = 2;       // Type an array (types a string, erases, type the next index)
 
 (function(){
-  var TypeWriter = function(_text, _options)
+  var TypeWriter = function($txt, $options, $parent)
   {
-    // Protect the scope
-    if (this === HTMLElement) { return new TypeWriter(_text, _options); }
+    if (this instanceof HTMLElement) return new TypeWriter($txt, $options, this);
 
-    // Parent Element
-    var me = this.parent = this;
+    // Validate Parameters
+    $txt = ($txt === undefined) ? 'I have no clue what to type' : $txt;
 
-    // Cursor
-    this.cursor = undefined;
+    if ( (typeof $txt == 'object') && !($txt instanceof Array) && ($options === undefined) )
+      $options = $txt;
 
-    // Options
-    this.options = undefined;
+    // Constructor
+    this.__parent = $parent;
+    this.__cursor = undefined;
+    this.__options = undefined;
+    this.__content = $txt;
+    this.__callback = undefined;
 
-    // Default content if it's not defined ( private variable )
-    var content = (_text === undefined) ? 'I have no clue what to type' : _text;
+    this.element = this.elem = this.el = this.__parent;
 
-    if (typeof _text === 'object' && !(_text instanceof Array) && _options === undefined) { _options = _text; }
-    // Callback starts out as undefined ( private variable )
-    var callback = undefined;
+    this.setOptions($options);
 
-    /**
-     * Method.......: Set Options
-     * Parameters...: new_options - the options to set
-     * Description..: Sets options for the library
-     */
-    this.setOptions = function(new_options)
+  }; // End TypeWriter Constructor
+
+
+  /**
+   * ================================
+   *   "Private" member functions
+   * ================================
+   */
+  TypeWriter.prototype.__default__ = function ($target, $default, $ref)
+  {
+    if ( ($ref[$target] === undefined) || (typeof $ref[$target] !== typeof $default) )
+      $ref[$target] = $default;
+  }; // End __default__
+
+
+  /**
+   * Method.......: Cursor No blink ( private )
+   * Description..: Stops the cursor from blinking
+   */
+  TypeWriter.prototype.__cursorNoBlink__ = function() {
+    var me = this;
+
+    // Add the no blink class if it doesn't already have it
+    if ( !me.__cursor.classList.contains(me.__options.cursor.no_blink_class) )
+      me.__cursor.classList.add(me.__options.cursor.no_blink_class);
+
+  }; // end __cursorNoBlink__
+
+
+  /**
+   * Method.......: Cursor Blink ( private )
+   * Description..: Allows the cursor to blink
+   */
+  TypeWriter.prototype.__cursorBlink__ = function() {
+    var me = this;
+
+    // Remove the no_blink_class if the cursor has it
+    if ( me.__cursor.classList.contains(me.__options.cursor.no_blink_class) )
+      me.__cursor.classList.remove(me.__options.cursor.no_blink_class);
+
+  }; // End __cursorBlink__
+
+
+  /**
+   * Method.......: Perform Callback ( private )
+   * Parameters...: $callback - overrides the default callback function
+   *                $delay - overrides the default callback delay
+   * Description..: Performs a callback function
+   */
+  TypeWriter.prototype.__performCallback__ = function($callback, $delay) {
+    var me = this;
+
+    if ( typeof $callback === 'number' ) { $delay = $callback; $calllback = undefined; }
+
+    var finalCallback = ( ($callback === undefined) || (typeof $callback !== 'function') ) ? me.__callback : $callback;
+    var finalDelay = ( ($delay === undefined) || (typeof $delay !== 'number') ) ? me.__options.callback_delay : $delay;
+
+    // Timeout to perform callback
+    if ( (finalCallback !== undefined) && (typeof finalCallback === 'function') )
     {
-      // Set default options to be empty if new_options is not set
-      this.options = ((new_options === undefined) || (typeof new_options !== 'object')) ? { } : new_options;
 
-      // Set default mode if needed
-      if ((this.options.mode === undefined) || (typeof this.options.mode !== 'number') || (this.options.mode > 2 || this.options.mode < 0)) { this.options.mode = TYPEWRITER_MODE_DEFAULT; } // Default mode
-
-      // Fix _text if the mode is default
-      if (((this.options.mode == TYPEWRITER_MODE_ARRAY) || (this.options.mode == TYPEWRITER_MODE_CORRECTION)) && !(content instanceof Array)) { this.options.mode = TYPEWRITER_MODE_DEFAULT; }
-      if ((this.options.mode == TYPEWRITER_MODE_DEFAULT) && (content instanceof Array))
-      {
-        if (content.length == 0) { content[0] = 'I have no clue what to type'; } // Give default string if the array is empty
-        content = content[0]; // Set text equal to the first element in the array
-      }
-
-      // Set default start delay if needed
-      if ((this.options.start_delay === undefined) || (typeof this.options.start_delay !== 'number')) { this.options.start_delay = 2; } // Default delay of 2 seconds
-
-      // Set default callback delay if needed
-      if ((this.options.callback_delay === undefined) || (typeof this.options.callback_delay !== 'number')) { this.options.callback_delay = 1; } // Default 1s callback delay
-
-      // Set default letter info if needed
-      if ((this.options.letters === undefined) || (typeof this.options.letters !== 'object')) { this.options.letters = {}; }
-
-      // Set default letter tag, class, and remove class if needed
-      if((this.options.letters.tag === undefined) || (typeof this.options.letters.tag !== 'string')) { this.options.letters.tag = 'span'; } // Default tag for letters is span
-      if ((this.options.letters.class === undefined) || (typeof this.options.letters.class !== 'string')) { this.options.letters.class = 'typewriter-letter'; } // Default CSS Class
-      if ((this.options.letters.remove_class === undefined) || (typeof this.options.letters.remove_class !== 'string')) { this.options.letters.remove_class = 'typewriter-letter-remove'; } // Default CSS Class for removing a letter
-
-      // Set default options for the cursor if needed
-      if ((this.options.cursor === undefined) || (typeof this.options.cursor !== 'object')) { this.options.cursor = {}; }
-      if ((this.options.cursor.tag === undefined) || (typeof this.options.cursor.tag !== 'string')) { this.options.cursor.tag = 'span'; } // Default tag for the cursor
-      if ((this.options.cursor.class === undefined) || (typeof this.options.cursor.class !== 'string')) { this.options.cursor.class = 'typewriter-cursor'; } // Default CSS Class
-      if ((this.options.cursor.no_blink_class === undefined) || (typeof this.options.cursor.no_blink_class !== 'string')) { this.options.cursor.no_blink_class = 'typewriter-cursor-noblink'; }
-
-      // Initialize the cursor if it does not exist
-      if (this.cursor === undefined)
-      {
-        this.cursor = document.createElement(this.options.cursor.tag);
-        this.cursor.classList.add(this.options.cursor.class);
-        this.parent.appendChild(this.cursor);
-      }
-
-      return this;
-    }; // End Set Options
-
-    /**
-     * Method.......: Set Content
-     * Parameters...: new_content
-     * Description..: Sets new content to type
-     */
-    this.setContent = function(new_content)
-    {
-      content = (new_content === undefined) ? content : new_content;
-
-      if ((content instanceof Array) && (this.options.mode != TYPEWRITER_MODE_ARRAY) && (this.options.mode != TYPEWRITER_MODE_CORRECTION))
-      {
-        content = (content[0] == undefined) ? 'I have no clue what to type' : content[0];
-      }
-
-      return this;
-    }; // End Set Content
-
-    /**
-     * Method.......: Set Callback
-     * Parameters...: new_callback - the callback to set
-     * Description..: Sets the callback function
-     */
-    this.setCallback = function(new_callback)
-    {
-      callback = ((new_callback === undefined) || (typeof new_callback !== 'function')) ? callback : new_callback;
-
-      return this;
-    }; // End setCallback
-
-    /**
-     * Method.......: Cursor No blink ( private )
-     * Description..: Stops the cursor from blinking
-     */
-    function cursorNoBlink()
-    {
-      if (!(me.cursor.classList.contains(me.options.cursor.no_blink_class)))
-      {
-        me.cursor.classList.add(me.options.cursor.no_blink_class); // Add the no blink class
-      }
-    } // End cursorNoBlink
-
-    /**
-     * Method.......: Cursor Blink ( private )
-     * Description..: Allows the cursor to blink
-     */
-    function cursorBlink()
-    {
-      if (me.cursor.classList.contains(me.options.cursor.no_blink_class))
-      {
-        me.cursor.classList.remove(me.options.cursor.no_blink_class); // Remove the no blink class
-      }
-    } // End cursorBlink
-
-    /**
-     * Method.......: Perform Callback ( private )
-     * Parameters...: _callback - overrides the default callback function
-     *                _delay - overrides the default callback delay
-     * Description..: Performs a callback function
-     */
-    function performCallback(_callback, _delay)
-    {
-      if (typeof _callback === 'number') { _delay = _callback; _callback = undefined; }
-
-      var the_callback = ((_callback !== undefined) && (typeof _callback === 'function')) ? _callback : callback; // Choose which callback to perform
-      var the_delay = ((_delay !== undefined) && (typeof _delay === 'number')) ? _delay : me.options.callback_delay;
-
-      // Event timer to perform the the_callback function after the_delay
       window.setTimeout(function(){
-        if ((the_callback !== undefined) && (typeof the_callback === 'function'))
-        {
-          the_callback(me); // Call the function, and pass it a reference to TypeWriter
-          if (the_callback == callback) { callback = undefined; } // Only perform the callback function once
-        }
-      }, the_delay * 1000);
+        // Perform callback function
+        finalCallback(me);
 
-    } // End performCallback
+        if ( finalCallback === me.__callback )
+          me.__callback = undefined;
+      }, finalDelay * 1000); // End setTimeout
+    }
 
-    /**
-     * Method.......: Type String ( private )
-     * Parameters...: str - the string to type
-     *                _callback - custom callback for array and correction
-     * Description..: Types a string
-     */
-    function typeString(str, _callback)
+  }; // End __performCallback__
+
+
+  /**
+   * Method.......: Mode Start
+   * Description..: Calls the appropriate function based on what mode the script is in
+   */
+  TypeWriter.prototype.__modeStart__ = function() {
+    var me = this;
+
+    switch (me.__options.mode)
     {
-      str = ((str === undefined) || (typeof str !== 'string')) ? 'Invalid String' : str;
+      // Default mode
+      case TYPEWRITER_MODE_DEFAULT:
+        me.__typeString__(me.__content);
+        break;
 
-      if (str.length > 0)
-      {
-        // When typing, do not let the cursor blink
-        cursorNoBlink();
+      // Correction Mode
+      case TYPEWRITER_MODE_CORRECTION:
+        me.__typeCorrection__();
+        break;
 
-        // Not a HTML tag, create element and add it
-        var letter = document.createElement(me.options.letters.tag);
-        letter.classList.add(me.options.letters.class);
-        letter.innerHTML = (str[0] == ' ') ? '&nbsp;' : str[0];
+      // Array mode
+      case TYPEWRITER_MODE_ARRAY:
+        me.__typeArray__();
+        break;
+    }
 
-        // Add animationend listener to chain next letter
-        letter.addEventListener('animationend', function(){
-          typeString(str.slice(1, str.length), _callback); // Type the next letter
-
-          this.removeEventListener('animationend', arguments.callee); // Remove event listener
-        });
-
-        // Insert letter at the end of the parent, but before the cursor
-        me.parent.insertBefore(letter, me.cursor);
-      }
-      else
-      {
-        // Done typing, let the cursor blink
-        cursorBlink();
-
-        performCallback(_callback); // Perform the callback function
-      }
-    } // End typeString
+  }; // End __modeStart__
 
 
-    /**
-     * Method.......: Type Array
-     * Description..: Types an array, and possibly does corrections
-     */
-    function typeArray()
+  /**
+   * Method.......: Type String ( private )
+   * Parameters...: $str - the string to type
+   *                $callback - custom callback for array and correction
+   * Description..: Types a string
+   */
+  TypeWriter.prototype.__typeString__ = function($str, $callback) {
+    var me = this;
+
+    $str = ( ($str === undefined) || (typeof $str !== 'string') ) ? 'Invalid String' : $str;
+
+    if ($str.length > 0)
     {
-      // Confirm the script is in the right mode and stuff
-      if ((content instanceof Array) && ((me.options.mode == TYPEWRITER_MODE_ARRAY) || (me.options.mode == TYPEWRITER_MODE_CORRECTION)))
-      {
-        if (content.length > 0)
-        {
-          if (content[0] instanceof Array)
-          {
-            typeCorrection(content[0], function(){
-              content = content.slice(1, content.length);
+      // When typing, do not let the cursor blink
+      me.__cursorNoBlink__();
 
-              if (content.length >= 1)
-              {
-                me.erase(function(){
-                  typeArray();
-                });
-              }
-              else
-              {
-                // No more elements, perform callback
-                performCallback();
-              }
-            }); // Send to type correction, not enough elements
-          }
-          else
-          {
-            typeString(content[0], function(){
-              content = content.slice(1, content.length);
-              if (content.length >= 1)
-              {
-                me.erase(function(){
-                  typeArray();
-                });
-              }
-              else
-              {
-                // No more elments, perform callback
-                performCallback();
-              }
-            })
-          }
+      // Create element and add it
+      var letter = document.createElement(me.__options.letters.tag || 'span');
+      letter.classList.add(me.__options.letters.class || 'typewriter-letter');
+      letter.innerHTML = ($str[0] == ' ') ? '&nbsp;' : $str[0];
 
-        }
-        else
-        {
-          performCallback(); // Do I need this???
-        }
-      }
-    } // End typeArray
+      // Add animationend listener to chain the next letter
+      letter.addEventListener('animationend', function(){
+        // Type the next letter
+        me.__typeString__($str.slice(1, $str.length), $callback);
 
-    /**
-     * Method.......: Type Correction
-     * Description..: Will type one string, then erase until they are different, making a correction.
-     */
-    function typeCorrection(_content, _callback)
+        // Remove this event listener
+        this.removeEventListener('animationend', arguments.callee);
+      }); // Event listener
+
+      me.__parent.insertBefore(letter, me.__cursor);
+    }
+    else
     {
-      if (_content === undefined) { _content = content; }
-      // Confirm script is in the correct mode and stuff
-      if ((_content instanceof Array) && (me.options.mode != TYPEWRITER_MODE_DEFAULT))
-      {
-        if (_content.length != 2)
-        {
-          typeString((_content[0] === undefined) ? "I don't know what to type" : _content[0]); // This only works with an array of two elements, silly users
-        }
-        else
-        {
-          // Type the first element
-          typeString(_content[0], function(){
-            // Find when they differ
-            var shortest_length = (_content[0].length <= _content[1].length) ? _content[0].length : _content[1].length; // Get length of shorter string
-            var different_at = shortest_length;
-            for (var i = 0; i < shortest_length; i++)
-            {
-              if (_content[0][i] != _content[1][i])
-              {
-                different_at = i; // Mark where they are difference
-                i = shortest_length; // Break the for-loop ( I'm sorry... )
-              }
-            } // End for
+      // Done typing
+      me.__cursorBlink__();
 
-            // backspace to where they are different
-            backspaceUntilLengthIs(different_at, function(){
-              typeString(_content[1].replace(_content[0].slice(0, different_at), ''), function(){
-                performCallback(_callback); // Perform the custom callback, or the original callback
+      me.__performCallback__($callback);
+    }
+
+  }; // End __typeString__
+
+
+  /**
+   * Method.......: Type Array
+   * Description..: Types an array, and possibly does corrections
+   */
+  TypeWriter.prototype.__typeArray__ = function() {
+    var me = this;
+
+    if ( (me.__content instanceof Array) && ((me.__options.mode == TYPEWRITER_MODE_ARRAY) || (me.__options.mode == TYPEWRITER_MODE_CORRECTION)) )
+    {
+      if (me.__content.length > 0)
+      {
+        if (me.__content[0] instanceof Array)
+        {
+          // Type a correction
+          me.__typeCorrection__(me.__content[0], function(){
+            me.__content = me.__content.slice(1, me.__content.length);
+
+            if (me.__content.length >= 1)
+              me.erase(function(){
+                me.__typeArray__();
               });
-            });
+            else
+              me.__performCallback__(); // No more elements in the array
+
+          });
+        }else{
+          // Type an array
+          me.__typeString__(me.__content[0], function(){
+            me.__content = me.__content.slice(1, me.__content.length);
+
+            if (me.__content.length >= 1)
+              me.erase(function(){
+                me.__typeArray__();
+              });
+            else
+              me.__performCallback__(); // No more elements in the array
+
           });
         }
-      }
-    } // End typeCorrection
 
-    /**
-     * Method.......: Backspace Until Length is
-     * Parameters...: desired_length - the length to backspace until
-     * Description..: Will backspace the words, until the desired length
-     */
-    function backspaceUntilLengthIs(desired_length, _callback)
+      } // End if
+    }
+
+  }; // End __typeArray__
+
+
+  /**
+   * Method.......: Type Correction
+   * Description..: Will type one string, then erase until they are different, making a correction.
+   */
+  TypeWriter.prototype.__typeCorrection__ = function($content, $callback) {
+    var me = this;
+
+    if ( ($content === undefined) || !($content instanceof Array) ) $content = me.__content;
+
+    // Confirm script is in the correct mode
+    if ( ($content instanceof Array) && (me.__options.mode != TYPEWRITER_MODE_DEFAULT) )
     {
-      if ((me.parent.childNodes.length - 1) > desired_length)
+      if ($content.length != 2) // Minimum of two elements needed for a correction
       {
-        me.backspace(function(){
-          backspaceUntilLengthIs(desired_length, _callback); // Keep backspacing
-        });
+        me.__typeString__($content[0] || "I don't know what to type");
       }
       else
       {
-        // Perform the callback
-        if ((_callback !== undefined))
-        {
-          performCallback(_callback);
-        }
-      }
-    } // End backspaceUntilLengthIs
+        // Type the elements
+        me.__typeString__($content[0], function(){
+          // Find where the strings are different
+          var shortestLength = ($content[0].length <= $content[1].length) ? $content[0].length : $content[1].length;
+          var differentAt = shortestLength;
 
-    /**
-     * Method.......: Erase
-     * Parameters...: _callback - callback override
-     * Description..: Erases what is typed ( uses backspace method )
-     */
-    this.erase = function(_callback)
-    {
-      if (this.parent.childNodes.length > 1)
-      {
-        // Stop cursor from blinking
-        cursorNoBlink();
-
-        this.backspace(function(){
-          me.erase(_callback); // Keep erasing
-        });
-      }
-      else
-      {
-        // Done erasing, let the cursor blink
-        cursorBlink();
-
-        // Perform callback w/ delay
-        if ((_callback !== undefined) && (typeof _callback === 'function'))
-        {
-          performCallback(_callback);
-        }
-      }
-      return;
-    }; // End erase
-
-
-    /**
-     * Method.......: Backspace
-     * Parameters...: _callback - callback  override
-     * Description..: Backspaces a character
-     */
-    this.backspace = function(_callback)
-    {
-      if (this.parent.childNodes.length > 1)
-      {
-        var last_letter = this.parent.childNodes.length - 2; // Minus two because the last child node is the cursor
-
-        this.parent.childNodes[last_letter].classList.add(this.options.letters.remove_class); // Add remove class
-
-        // Animationend event listener
-        this.parent.childNodes[last_letter].addEventListener('animationend', function(){
-          me.parent.removeChild(me.parent.childNodes[last_letter]); // Remove the letter element
-
-          this.removeEventListener('animationend', arguments.callee); // Remove event listener
-
-          if ((_callback !== undefined) && (typeof _callback === 'function'))
+          for (var i = 0; i < shortestLength; i++)
           {
-            performCallback(_callback, 0);
-          }
+            if ($content[0][i] != $content[1][i])
+            {
+              differentAt = i;
+              i = shortestLength; // break the loop
+            }
+          } // End for
+
+          // Backspace to where they are different
+          me.__backspaceToLength__(differentAt, function(){
+            // Type correction
+            me.__typeString__($content[1].replace($content[0].slice(0, differentAt), ''), function(){
+              me.__performCallback__($callback);
+            });
+
+          }); // End backspace to length
+
         });
       }
-    }; // End backspace
 
+    } // End mode check
+
+  }; // End __typeCorrection__
+
+
+  /**
+   * Method.......: Backspace Until Length is
+   * Parameters...: $length - the length to backspace until
+   * Description..: Will backspace the words, until the desired length
+   */
+  TypeWriter.prototype.__backspaceToLength__ = function($length, $callback) {
+    var me = this;
+
+    if ( (me.__parent.childNodes.length - 1) > $length)
+    {
+      // Keep backspacing
+      me.backspace(function(){
+        me.__backspaceToLength__($length, $callback);
+      });
+    }
+    else
+    {
+      // Done backspacing
+      if ( ($callback !== undefined) && (typeof $callback === 'function') )
+        me.__performCallback__($callback);
+    }
+
+  }; // End __backspaceToLength__
+
+
+
+
+  /**
+   * ================================
+   *    "Public" member functions
+   * ================================
+   */
+
+
+  /**
+   * Method.......: Set Options
+   * Parameters...: $newOptions - the options to set
+   * Description..: Sets options for the library
+   */
+  TypeWriter.prototype.setOptions = function($newOptions) {
+    var me = this;
+
+    var options = (($newOptions === undefined) || (typeof $newOptions !== 'object')) ? { } : $newOptions;
 
     /**
-     * Method.......: Mode Start
-     * Description..: Calls the appropriate function based on what mode the script is in
+     * Set default options, and valid options if they exist
      */
-    function modeStart()
+    if ( (options.mode === undefined) || (typeof options.mode !== 'number') || (options.mode > 2 || options.mode < 0) )
+      options.mode = TYPEWRITER_MODE_DEFAULT;
+
+    if ( (options.mode == TYPEWRITER_MODE_CORRECTION || options.mode == TYPEWRITER_MODE_ARRAY) &&
+        !(me.__content instanceof Array) )
+        options.mode = TYPEWRITER_MODE_DEFAULT;
+
+    if ( (options.mode == TYPEWRITER_MODE_DEFAULT) && (me.__content instanceof Array) )
+      if ( me.__content.length == 0 )
+        me.__content = 'I have no clue what to type';
+      else
+        me.__content = me.__content[0];
+
+    // Default start delay (2s)
+    me.__default__('start_delay', 2, options);
+
+    // Default callback delay (1s)
+    me.__default__('callback_delay', 1, options);
+
+    // Default letter
+    me.__default__('letters', {}, options);
+    me.__default__('tag', 'span', options.letters);
+    me.__default__('class', 'typewriter-letter', options.letters);
+    me.__default__('remove_class', 'typewriter-letter-remove', options.letters);
+
+    // Default cursor
+    me.__default__('cursor', {}, options);
+    me.__default__('tag', 'span', options.cursor);
+    me.__default__('class', 'typewriter-cursor', options.cursor);
+    me.__default__('no_blink_class', 'typewriter-cursor-noblink', options.cursor);
+
+    if ( me.__cursor === undefined )
     {
-      switch (me.options.mode)
-      {
-        // Default mode
-        case TYPEWRITER_MODE_DEFAULT:
-          typeString(content); // Type String
-          break;
+      me.__cursor = document.createElement(options.cursor.tag);
+      me.__cursor.classList.add(options.cursor.class);
+      me.__parent.appendChild(me.__cursor);
+    }
 
-        // Correction Mode
-        case TYPEWRITER_MODE_CORRECTION:
-          typeCorrection(); // Type correction
-          break;
+    // Update the options
+    me.__options = options;
 
-        // Array Mode and Array with Correction s
-        case TYPEWRITER_MODE_ARRAY:
-          typeArray(); // Type Array/Array with corrections
-          break;
-      }
-    } // End modeStart
+    return me;
 
-    /**
-     * Method.......: Start
-     * Parameters...: _callback - overrides the callback function
-     * Description..: Begins typing after delay
-     */
-    this.start = function(_callback)
+  }; // End setOptions
+
+
+  /**
+   * Method.......: Set Content
+   * Parameters...: $newContent
+   * Description..: Sets new content to type
+   */
+  TypeWriter.prototype.setContent = function($newContent) {
+    var me = this;
+
+    me.__content = ($newContent === undefined) ? me.__content : $newContent;
+
+    if ( (me.__content instanceof Array) && (me.__options.mode != TYPEWRITER_MODE_ARRAY) && (me.__options.mode != TYPEWRITER_MODE_CORRECTION) )
+      me.__content = (me.__content[0] === undefined) ? 'I have no clue what to type' : me.__content[0];
+
+    return me;
+
+  }; // End setContent
+
+
+  /**
+   * Method.......: Set Callback
+   * Parameters...: $newCallback - the callback to set
+   * Description..: Sets the callback function
+   */
+  TypeWriter.prototype.setCallback = function($newCallback) {
+    var me = this;
+
+    if ( ($newCallback !== undefined) && (typeof $newCallback === 'function') )
+      me.__callback = $newCallback;
+
+    return me;
+
+  }; // End setCallback
+
+
+  /**
+   * Method.......: Backspace
+   * Parameters...: $callback - callback  override
+   * Description..: Backspaces a character
+   */
+  TypeWriter.prototype.backspace = function($callback) {
+    var me = this;
+
+    // Only backspace if there is a character to backspace (> 1 because it will have 1 child because of the cursor)
+    if ( me.__parent.childNodes.length > 1 )
     {
-      if (_callback !== undefined) { this.setCallback(_callback); } // Attempt to override the callback function with _callback
+      var lastLetter = me.__parent.childNodes.length - 2; // -2 because the last child node is the cursor
 
-      // Start typing after delay
-      window.setTimeout(function(){
-        modeStart(); // Begin typing
-      }, this.options.start_delay * 1000);
+      // Animation event listener
+      me.__parent.childNodes[lastLetter].addEventListener('animationend', function(){
+        // Remove the letter element
+        me.__parent.removeChild(me.__parent.childNodes[lastLetter]);
 
-    }; // End start
+        this.removeEventListener('animationend', arguments.callee); // Remove the event listener
 
-    /**
-     * Method.......: Start No Delay
-     * Parameters...: _callback - ovverrides the callback
-     * Description..: Begins typing without a delay
-     */
-    this.startNoDelay = function(_callback)
+        if ( ($callback !== undefined) && (typeof $callback === 'function') )
+          me.__performCallback__($callback, 0); // perform the callback function
+
+      });
+
+      // Add the class to remove the letter, and triggers the animationend event listener
+      me.__parent.childNodes[lastLetter].classList.add(me.__options.letters.remove_class || 'typewriter-letter-remove');
+
+    }
+
+  }; // End backspace
+
+
+  /**
+   * Method.......: Erase
+   * Parameters...: $callback - callback override
+   * Description..: Erases what is typed ( uses backspace method )
+   */
+  TypeWriter.prototype.erase = function($callback) {
+    var me = this;
+
+    // Only erase if there are any letters
+    if ( me.__parent.childNodes.length > 1 )
     {
-      if (_callback !== undefined) { this.setCallback(_callback); } // Attempt to set new callback function
+      // Stop the cursor blinking
+      me.__cursorNoBlink__();
 
-      // Start typing wihtout a delay
-      modeStart();
+      // Backspace, and then keep erasing
+      me.backspace(function(){
+        me.erase($callback);
+      });
+    }
+    else
+    {
+      // Done erasing, let the cursor blink
+      me.__cursorBlink__();
 
-    }; // End startNoDelay
+      if ( ($callback !== undefined) && (typeof $callback === 'function') )
+        me.__performCallback__($callback);
+    }
+
+  }; // End erase
 
 
-    /*
-     * Constructor stuff
-     */
-    this.setOptions(_options);
-    
-    return this;
+  /**
+   * Method.......: Start
+   * Parameters...: $callback - overrides the callback function
+   * Description..: Begins typing after delay
+   */
+  TypeWriter.prototype.start = function($callback) {
+    var me = this;
 
-  }; // End TypeWriter
+    if ( ($callback !== undefined) && (typeof $callback === 'function') )
+      me.setCallback($callback);
+
+    // Start typing after a delay
+    window.setTimeout(function(){
+
+      me.__modeStart__();
+    }, me.__options.start_delay * 1000);
+
+  }; // End start
 
 
-  if (!HTMLElement.prototype.typewriter)
+  /**
+   * Method.......: Start No Delay
+   * Parameters...: $callback - ovverrides the callback
+   * Description..: Begins typing without a delay
+   */
+  TypeWriter.prototype.startNoDelay = function($callback) {
+    var me = this;
+
+    if ( ($callback !== undefined) && (typeof $callback === 'function') )
+      me.setCallback($callback);
+
+    // Start typing, no delay
+    me.__modeStart__();
+
+  }; // End startNoDelay
+
+
+
+  if ( !HTMLElement.prototype.typewriter )
   {
     HTMLElement.prototype.typewriter = TypeWriter;
   }
-})();
-
-
-
-/**
- * Method.......:
- * Parameters...:
- * Description..:
- */
+}());
